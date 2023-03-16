@@ -21,15 +21,15 @@ find data/merged_output.json -type f -delete
 python arcgis.py
 python usmart.py
 python ckan.py
-python sparkql_statistics.py
+# python sparkql_statistics.py
 python dcat.py
-cd web-scrapers
-python aberdeenshire_council_scraper.py
-python east_ayrshire_scraper.py
-python moray_council_scraper.py
-python nls_scraper.py
-python sqa_scraper.py
-cd ..
+# cd web-scrapers
+# python aberdeenshire_council_scraper.py
+# python east_ayrshire_scraper.py
+# python moray_council_scraper.py
+# python nls_scraper.py
+# python sqa_scraper.py
+# cd ..
 # processing
 python merge_data.py
 python export2jkan.py

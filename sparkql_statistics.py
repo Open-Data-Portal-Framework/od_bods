@@ -77,7 +77,7 @@ class ProcessorSparkQL(Processor):
                 .drop(columns = ['publisher'])
 
         # File Path
-        fname = os.path.join("data", self.type, "scotgov-datasets-sparkql" + ".csv")
+        fname = os.path.join("data", "scotgov-datasets-sparkql" + ".csv")
         dfOds.to_csv(fname,index=False)
 
 processor = ProcessorSparkQL()
