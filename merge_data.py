@@ -27,7 +27,7 @@ def merge_data():
     source_ckan["Source"] = "ckan API"
 
 
-    '''### From scotgov csv
+    ### From scotgov csv
     source_scotgov = pd.read_csv("data/scotgov-datasets-sparkql.csv")
     source_scotgov = source_scotgov.rename(
         columns={
@@ -44,7 +44,7 @@ def merge_data():
     source_scotgov["Source"] = "sparql"
     source_scotgov['DateUpdated'] = pd.to_datetime(source_scotgov['DateUpdated'], utc=True).dt.tz_localize(None)
     source_scotgov['DateCreated'] = pd.to_datetime(source_scotgov['DateCreated'], utc=True).dt.tz_localize(None)
-'''
+
 
     ### From arcgis api
     source_arcgis = pd.DataFrame()
@@ -123,7 +123,7 @@ def merge_data():
             source_ckan,
             source_arcgis,
             source_usmart,
-            #source_scotgov,
+            source_scotgov,
             source_dcat,
             #source_scraped
         ]
