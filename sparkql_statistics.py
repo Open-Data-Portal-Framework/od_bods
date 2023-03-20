@@ -40,7 +40,10 @@ class ProcessorSparkQL(Processor):
         data = parse.urlencode({"query": sparkql}).encode()
 
         # API REQUEST
-        req = request.Request("http://statistics.gov.scot/sparql", data=data)
+        url = "http://statistics.gov.scot/sparql"
+        req = request.Request(url, data=data)
+        print(f"Processing {url}")
+        
         req.add_header("Accept", "text/csv")
         req.add_header("Contect-type", "application/x-www-form-urlencoded")
         resp = request.urlopen(req)
@@ -77,7 +80,7 @@ class ProcessorSparkQL(Processor):
                 .drop(columns = ['publisher'])
 
         # File Path
-        fname = os.path.join("data", "scotgov-datasets-sparkql" + ".csv")
+        fname = os.path.join("data", f"{self.type}", "scotgov-datasets-sparkql" + ".csv")
         dfOds.to_csv(fname,index=False)
 
 processor = ProcessorSparkQL()

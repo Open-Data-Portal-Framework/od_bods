@@ -29,7 +29,7 @@ def merge_data():
 
 
     ### From scotgov csv
-    source_scotgov = pd.read_csv("data/scotgov-datasets-sparkql.csv")
+    source_scotgov = pd.read_csv("data/sparkql/scotgov-datasets-sparkql.csv")
     source_scotgov = source_scotgov.rename(
         columns={
             "title": "Title",

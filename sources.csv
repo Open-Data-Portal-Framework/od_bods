@@ -7,10 +7,12 @@ edinburgh,"https://city-of-edinburgh-council-open-spatial-data-cityofedinburgh.h
 
 highland,"https://map-highland.opendata.arcgis.com/api/feed/dcat-ap/2.0.1.json",dcat
 
+
 Dumfries and Galloway Council,"https://discovery.usmart.io/org/9762f781-5c04-4759-a70b-afc585af1d12/dcat/data.json",USMART
 
 Aberdeen City Council,https://data.aberdeencity.gov.uk/,ckan
 
+Coral G,"https://cg-hubdev-cggis.opendata.arcgis.com/api/feed/dcat-ap/2.0.1.json",dcat
 
 Spatial Hub, https://data.spatialhub.scot/,ckan
 

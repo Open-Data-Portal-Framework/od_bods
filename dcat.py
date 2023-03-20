@@ -12,7 +12,7 @@ class ProcessorDCAT(Processor):
         super().__init__(type="dcat")
 
     def get_datasets(self, owner, start_url, fname):
-        print(start_url)
+        print(f"Processing {start_url}")
         d = processor.get_json(start_url)
         if d != "NULL":
 
@@ -46,6 +46,7 @@ class ProcessorDCAT(Processor):
                     "",  # license
                     e.get("dct:description", "").strip("\u200b"),
                 ]
+                print(e.get("dct:title", ""))
                 pages = e.get("dcat:distribution")
                 for p in pages:
                     if p.get("dct:description", "") == "Web Page":
@@ -77,3 +78,4 @@ processor = ProcessorDCAT()
 
 if __name__ == "__main__":
     processor.process()
+    print("\n")

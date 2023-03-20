@@ -14,7 +14,7 @@ class ProcessorCKAN(Processor):
         if url[-1] != "/":
             url = url + "/"
 
-        datasets = processor.get_json(f"{url}/api/3/action/package_list")
+        datasets = processor.get_json(f"{url}api/action/package_list")
         if datasets != "NULL":
 
             print(f"Found {len(datasets['result'])} datasets")
@@ -22,12 +22,10 @@ class ProcessorCKAN(Processor):
             prepped = []
             for dataset_name in datasets["result"]:
                 dataset_metadata = processor.get_json(
-                    f"{url}/api/3/action/package_show?id={dataset_name}"
+                    f"{url}api/action/package_show?id={dataset_name}"
                 )
 
-                print(
-                    f"Got {dataset_name} with success status: {dataset_metadata['success']}"
-                )
+                print(f"Got {dataset_name} with success status: {dataset_metadata['success']}")
 
                 dataset_metadata = dataset_metadata["result"]
 
@@ -104,3 +102,4 @@ class ProcessorCKAN(Processor):
 
 processor = ProcessorCKAN()
 processor.process()
+print("\n")

@@ -9,6 +9,7 @@ class ProcessorUSMART(Processor):
         super().__init__(type="USMART")
 
     def get_datasets(self, owner, start_url, fname):
+        print(f"Processing {start_url}")
         data = processor.get_json(start_url)
         if data != "NULL":
             datasets = data["dataset"]
@@ -17,6 +18,7 @@ class ProcessorUSMART(Processor):
             prepped = []
 
             for dataset in datasets:
+                print(dataset["title"])
                 Title = dataset["title"]
                 Owner = owner
                 PageURL = dataset["landingPage"].replace(" ", "%20")
@@ -52,7 +54,7 @@ class ProcessorUSMART(Processor):
                 else:
                     ManualTags.append(" ")
                 for item in filetypes:
-                    print(filetypes[item][1])
+                    # print(filetypes[item][1])
                     line = [
                         Title,
                         Owner,
@@ -80,3 +82,4 @@ processor = ProcessorUSMART()
 
 if __name__ == "__main__":
     processor.process()
+    print("\n")

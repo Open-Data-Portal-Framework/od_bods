@@ -10,6 +10,7 @@ class ProcessorARCGIS(Processor):
         super().__init__(type="arcgis")
 
     def get_datasets(self, owner, start_url, fname):
+        print(f"Processing {start_url}")
         datasets = []
 
         url = start_url
@@ -20,7 +21,8 @@ class ProcessorARCGIS(Processor):
                 datasets += d["data"]
                 if "next" in d["meta"] and d["meta"]["next"]:
                     url = d["meta"]["next"]
-                    print(f"Next {url}")
+
+                    # print(f"Next {url}")
                 else:
                     break
 
@@ -52,6 +54,7 @@ class ProcessorARCGIS(Processor):
                     e["attributes"].get("searchDescription", ""),
                 ]
             )
+            print(e["attributes"].get("name", ""))
         processor.write_csv(fname, prepped)
 
 
@@ -59,3 +62,4 @@ processor = ProcessorARCGIS()
 
 if __name__ == "__main__":
     processor.process()
+    print("\n")
