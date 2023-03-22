@@ -1,19 +1,11 @@
-# The OD_BODS Project
-OD_BODS is a volunteer-run open source project to collate open data sources published in Scotland. 
+# OD_BODS Repository
+Od_bods repository is created and based upon the structure of the_od_bods repository of Open Data Scotland.
+Its goal is to help developer launch their new open data portals using the data scraping functions this repository provides.
 
-See it in action: [opendata.scot](https://opendata.scot/)
+# More about ODP Framework
+Read [the docs] to understand it in more detail.
 
-
-There are 2 objectives for the OD_BODS project
-1. Find: Help public users find a data source they can use
-2. Learn: Understand how Open Data is in Scotland
-
-
-# More info
+# More info about Open Data Scotland
 Read [the docs](https://docs.opendata.scot/) to find our more about the 12-month plan for the project, its history, the tools we are using, and how to contribute
+See the Open Data Scotland project in action: [opendata.scot](https://opendata.scot/)
 
-# Contact Us
-* on Twitter [@opendata_sco](https://twitter.com/opendata_sco) 
-* on [Slack: Open Data Scotland](https://join.slack.com/t/opendatascotland/shared_invite/zt-yfcc64tg-xIF1cOxkWbKZqI8ZBPzkGg) #ods-website
-
-We are looking for contributors!
