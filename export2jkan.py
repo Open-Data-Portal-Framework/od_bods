@@ -216,8 +216,8 @@ for n, (k, ds) in enumerate(data.items()):
     # fn = f'{ds.owner}-{ds.title}'
     # fn = re.sub(r'[^\w\s-]', '', fn).strip()[:100]
     fn = urllib.parse.quote_plus(f"{(ds.owner).lower()}-{(ds.title).lower()}")
-    # fn = {ds.owner}-{ds.title})
-    # ^^ need something better for filnames...
+    # fn = f"{ds.owner}-{ds.title}"
+    # ^^ need something better for filenames...
     with open(f"../jkan/_datasets/{fn}.md", "w") as f:
         f.write("---\n")
         f.write(yaml.dump(y))
