@@ -27,23 +27,18 @@ class Dataset:
     page_url: str
     date_created: str
     date_updated: str
-    ods_categories: List[str]
+    odp_categories: List[str]
     license: str
     description: str
     num_records: int
     files: List[DataFile]
 
 
-fulld = pd.read_json("data/merged_output.json", orient="records").fillna("")
-
 ### Extraction of date from ISO datetime ISO.
 def strip_date_from_iso8601(df_name, col_list):
     for col in col_list:
         df_name[col] = df_name[col].str.split("T").str[0]
     return
-
-
-strip_date_from_iso8601(fulld, ["DateCreated", "DateUpdated"])
 
 
 def ind(name):
@@ -65,8 +60,8 @@ def ind(name):
         "Description",
         "Source",
         "AssetStatus",
-        "ODSCategories",
-        "ODSCategories_Keywords"
+        "ODPCategories",
+        "ODPCategories_Keywords"
     ]
     return f.index(name)
 
@@ -91,81 +86,44 @@ def makeint(val):
         pass
     return None
 
+def organize_data(fulld):
+    data = {}
+    for record in fulld.values:
+        record_id = str(record[ind("PageURL")]) + record[ind("Title")]
+        if record_id not in data:
+            ds = Dataset(
+                title=record[ind("Title")],
+                owner=record[ind("Owner")],
+                page_url=record[ind("PageURL")],
+                date_created=record[ind("DateCreated")],
+                date_updated=record[ind("DateUpdated")],
+                odp_categories=splittags(record[ind("ODPCategories")]),
+                license=record[ind("License")],
+                description=str(record[ind("Description")]),
+                num_records=makeint(record[ind("NumRecords")]),
+                files=[],
+            )
+            # Sort categories to keep consistent when syncing
+            ds.odp_categories.sort()
+            data[record_id] = ds
 
-data = {}
-for r in fulld.values:
-    id = str(r[ind("PageURL")]) + r[ind("Title")]
-    if id not in data:
-        ds = Dataset(
-            title=r[ind("Title")],
-            owner=r[ind("Owner")],
-            page_url=r[ind("PageURL")],
-            date_created=r[ind("DateCreated")],
-            date_updated=r[ind("DateUpdated")],
-            ods_categories=splittags(r[ind("ODSCategories")]),
-            license=r[ind("License")],
-            description=str(r[ind("Description")]),
-            num_records=makeint(r[ind("NumRecords")]),
-            files=[],
+        data[record_id].files.append(
+            DataFile(
+                url=record[ind("AssetURL")],
+                size=record[ind("FileSize")],
+                size_unit=record[ind("FileSizeUnit")],
+                file_type=record[ind("FileType")],
+                file_name=record[ind("FileName")],
+                show_name=record[ind("FileName")] if record[ind("FileName")] else record[ind("FileType")],
+            )
         )
-
-        # Sort categories to keep consistent when syncing
-        ds.ods_categories.sort()
-
-        data[id] = ds
-    data[id].files.append(
-        DataFile(
-            url=r[ind("AssetURL")],
-            size=r[ind("FileSize")],
-            size_unit=r[ind("FileSizeUnit")],
-            file_type=r[ind("FileType")],
-            file_name=r[ind("FileName")],
-            show_name=r[ind("FileName")] if r[ind("FileName")] else r[ind("FileType")],
-        )
-    )
+    return data
 
 
-unknown_lics = []
+unknown_licences = []
 
 
 def license_link(l):
-    '''
-    code below is probably not required anymore after new tidy_licences() in merge_data.py
-    ogl = [
-        "Open Government Licence 3.0 (United Kingdom)",
-        "uk-ogl",
-        "UK Open Government Licence (OGL)",
-        "OGL3",
-        "Open Government Licence v3.0",
-    ]
-    if l in ogl:
-        return (
-            "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-        )
-    '''
-    '''
-    # previous approach, but more lines of code
-    if l == "Open Government Licence v2.0":
-        return "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/"
-    if l == "Open Government Licence v3.0":
-        return "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-    if l == "Creative Commons Attribution Share-Alike 3.0":
-        return "https://creativecommons.org/licenses/by-sa/3.0/"
-    if l == "Creative Commons Attribution Share-Alike 4.0":
-        return "https://creativecommons.org/licenses/by-sa/4.0/"
-    if l == "Creative Commons Attribution 4.0 International":
-        return "https://creativecommons.org/licenses/by/4.0/"
-    if l == "Open Data Commons Open Database License 1.0":
-        return "https://opendatacommons.org/licenses/odbl/"
-    if l == "Creative Commons CC0":
-        return "https://creativecommons.org/share-your-work/public-domain/cc0"
-    if l == "Non-Commercial Use Only":
-        return "https://rightsstatements.org/page/NoC-NC/1.0/"
-    if l == "No Known Copyright":
-        return "https://rightsstatements.org/vocab/NKC/1.0/"
-    if l == "Public Domain":
-        return "https://creativecommons.org/publicdomain/mark/1.0/"
-    '''
 
     known_licence_links = {
         "Open Government Licence v2.0": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/",
@@ -184,42 +142,55 @@ def license_link(l):
         if l == key:
             return known_licence_links[key]
 
-    if not l in unknown_lics:
-        unknown_lics.append(l)
+    if l not in unknown_licences:
+        unknown_licences.append(l)
         # print("Unknown license: ", l)
     return l
 
-md = markdown.Markdown()
+def replace_folder(datasets_folder):
+    ### Replace folder by deleting and writing   
+    if os.path.exists(datasets_folder):
+        shutil.rmtree(datasets_folder)
+    os.makedirs(datasets_folder)
 
-### Replace folder by deleting and writing
-shutil.rmtree("../jkan/_datasets/")
-os.makedirs("../jkan/_datasets/")
+def prepare_and_export_data(full_d, datasets_folder):
+    strip_date_from_iso8601(full_d, ["DateCreated", "DateUpdated"])
+    organized_data = organize_data(full_d)
+    replace_folder(datasets_folder)
+
+    for n, (k, ds) in enumerate(organized_data.items()):
+        y = {"schema": "default"}
+        y["title"] = ds.title
+        y["organization"] = ds.owner
+        
+        if ds.description != "{{description}}":
+            y["notes"] = markdown.markdown(ds.description)
+        else:
+            y["notes"] = markdown.markdown("")
+
+        y["original_dataset_link"] = ds.page_url
+        y["resources"] = [
+            {"name": d.show_name, "url": d.url, "format": d.file_type}
+            for d in ds.files
+            if d.url
+        ]
+        y["license"] = license_link(ds.license)
+        y["category"] = ds.odp_categories
+        y["maintainer"] = ds.owner
+        y["date_created"] = ds.date_created
+        y["date_updated"] = ds.date_updated
+        y["records"] = ds.num_records
+        # fn = f'{ds.owner}-{ds.title}'
+        # fn = re.sub(r'[^\w\s-]', '', fn).strip()[:100]
+        fn = urllib.parse.quote_plus(f"{(ds.owner).lower()}-{(ds.title).lower()}")
+        # fn = f"{ds.owner}-{ds.title}"
+        # ^^ need something better for filenames...
+        with open(f"{datasets_folder}/{fn}.md", "w") as f:
+            f.write("---\n")
+            f.write(yaml.dump(y))
+            f.write("---\n")
 
 
-for n, (k, ds) in enumerate(data.items()):
-    y = {"schema": "default"}
-    y["title"] = ds.title
-    y["organization"] = ds.owner
-    y["notes"] = markdown.markdown(ds.description)
-    y["original_dataset_link"] = ds.page_url
-    y["resources"] = [
-        {"name": d.show_name, "url": d.url, "format": d.file_type}
-        for d in ds.files
-        if d.url
-    ]
-    y["license"] = license_link(ds.license)
-    y["category"] = ds.ods_categories
-    y["maintainer"] = ds.owner
-    y["date_created"] = ds.date_created
-    y["date_updated"] = ds.date_updated
-    y["records"] = ds.num_records
-    # fn = f'{ds.owner}-{ds.title}'
-    # fn = re.sub(r'[^\w\s-]', '', fn).strip()[:100]
-    fn = urllib.parse.quote_plus(f"{(ds.owner).lower()}-{(ds.title).lower()}")
-    # fn = f"{ds.owner}-{ds.title}"
-    # ^^ need something better for filenames...
-    with open(f"../jkan/_datasets/{fn}.md", "w") as f:
-        f.write("---\n")
-        f.write(yaml.dump(y))
-        f.write("---\n")
-
+if __name__ == "__main__":
+    full_data = pd.read_json("data/merged_output.json", orient="records").fillna("")
+    prepare_and_export_data(full_data, "../jkan/_datasets/")

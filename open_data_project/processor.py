@@ -7,7 +7,7 @@ import os
 
 
 class Processor:
-    # Type should be one of the following: 'dcat', 'arcgis', 'usmart'
+    # Type should be one of the following: 'dcat', 'arcgis', 'USMART'
     def __init__(self, type):
         self.type = type
         self.header = [

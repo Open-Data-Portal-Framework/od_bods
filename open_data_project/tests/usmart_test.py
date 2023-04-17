@@ -19,15 +19,15 @@ def list_sources(dir):
     return sources
 
 
-@pytest.mark.parametrize("sources", list_sources("tests/mock_data/usmart"))
+@pytest.mark.parametrize("sources", list_sources("tests/mock_data/USMART"))
 def test_get_datasets(sources):
     owner = "test_owner"
-    outputdir = "tests/mock_data/output/usmart/"
+    outputdir = "tests/mock_data/output/USMART/"
     start_url = "file:///" + os.path.abspath(
-        "tests/mock_data/usmart/" + sources + ".json"
+        "tests/mock_data/USMART/" + sources + ".json"
     )
     fname = outputdir + sources + ".csv"
-    expected_fname = "tests/mock_data/usmart/expected/" + sources + ".csv"
+    expected_fname = "tests/mock_data/USMART/expected/" + sources + ".csv"
     if os.path.exists(fname):
         os.remove(fname)
     if not os.path.exists(outputdir):

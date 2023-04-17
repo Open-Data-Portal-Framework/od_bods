@@ -1,7 +1,9 @@
 import pandas as pd
 import json
 
-data = pd.read_csv("../data/merged_output.csv", lineterminator="\n")
+data = pd.read_json("../data/merged_output.json")
+data = data.to_csv("merged_output.csv", index=None)
+data = pd.read_csv("merged_output.csv")
 
 ### Reducing assets to datasets as per display in frontend (grouped by Title + PageURL)
 data = data[
@@ -12,24 +14,24 @@ data = data[
         "Description",
         "OriginalTags",
         "ManualTags",
-        "ODSCategories",
-        "ODSCategories_Keywords",
+        "ODPCategories",
+        "ODPCategories_Keywords"
     ]
 ].drop_duplicates()
 
 ### Converting json string into dictionary
-data["ODSCategories_Keywords"] = data["ODSCategories_Keywords"].apply(eval)
+data["ODPCategories_Keywords"] = data["ODPCategories_Keywords"].apply(eval)
 
-with open("../ODSCategories.json", "r") as json_file:
-    ods_categories = json.load(json_file)
+with open("../ODPCategories.json", "r") as json_file:
+    odp_categories = json.load(json_file)
 
-    ### Cleaning of ODSCategories.json file
-    for cat in ods_categories:
-        ods_categories[cat] = [keyword.lower() for keyword in ods_categories[cat]]
-        ods_categories[cat].sort()
+    ### Cleaning of ODPCategories.json file
+    for cat in odp_categories:
+        odp_categories[cat] = [keyword.lower() for keyword in odp_categories[cat]]
+        odp_categories[cat].sort()
 ### Save cleaned file
-with open("../ODSCategories.json", "w") as json_file:
-    json.dump(ods_categories, json_file, indent=3)
+with open("../ODPCategories.json", "w") as json_file:
+    json.dump(odp_categories, json_file, indent=3)
 
 
 ### Number of datasets in each category
@@ -46,18 +48,18 @@ def categories_count(df_column):
         .rename(columns={0: df_column})
     )
     
-cat_counts = categories_count("ODSCategories")
+cat_counts = categories_count("ODPCategories")
 
 
 ### Number of datasets with n categories (out of 16 possible categories)
 asset_catcounts = (
-    data["ODSCategories"].str.split(";").str.len().value_counts().sort_index()
+    data["ODPCategories"].str.split(";").str.len().value_counts().sort_index()
 )
 
 
 ### Keywords used in each category
 cat_set = {}
-for asset in data["ODSCategories_Keywords"]:
+for asset in data["ODPCategories_Keywords"]:
     for cat, keywords in asset.items():
         if cat in cat_set:
             cat_set[cat].extend(keywords)
@@ -74,17 +76,17 @@ for cat in cat_set:
 
 ### Keywords not used in each category
 cat_set_unused = {}
-for cat in ods_categories:
+for cat in odp_categories:
     cat_set_unused[cat] = [
-        k for k in ods_categories[cat] if k not in cat_set_aggregated[cat]
+        k for k in odp_categories[cat] if k not in cat_set_aggregated[cat]
     ]
 
 
 ### Duplicate keywords in each category
 cat_set_duped = {}
-for cat in ods_categories:
+for cat in odp_categories:
     list_dupes = list(
-        set([i for i in ods_categories[cat] if ods_categories[cat].count(i) >= 2])
+        set([i for i in odp_categories[cat] if odp_categories[cat].count(i) >= 2])
     )
     if len(list_dupes) > 0:
         cat_set_duped[cat] = list_dupes
@@ -96,8 +98,8 @@ if len(cat_set_duped) < 1:
 ### Keywords in multiple categories
 cat_set_multicat = {}
 cat_set_multicat_temp = pd.DataFrame()
-for cat in ods_categories:
-    temp = pd.DataFrame(ods_categories[cat], columns=["keyword"])
+for cat in odp_categories:
+    temp = pd.DataFrame(odp_categories[cat], columns=["keyword"])
     temp["cat"] = cat
     cat_set_multicat_temp = pd.concat(
         [cat_set_multicat_temp, temp], axis=0, ignore_index=True
@@ -121,7 +123,7 @@ if len(cat_set_multicat) < 1:
 
 ### Uncategorised datasets
 uncategorised_datasets = data.loc[
-    data["ODSCategories"] == "Uncategorised", ["Title", "Description"]
+    data["ODPCategories"] == "Uncategorised", ["Title", "Description"]
 ].drop_duplicates()
 
 

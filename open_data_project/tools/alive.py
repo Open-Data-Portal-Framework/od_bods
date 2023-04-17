@@ -6,17 +6,13 @@ from urllib.error import URLError, HTTPError
 import csv
 import os
 
-GITHUB_REPO = "OpenDataScotland/the_od_bods"
-
+# put the name of your repo
+GITHUB_REPO = "OpenDataPortalFramework-Demo/od_bods"
+# put your personal access token
 github_access_token = os.environ.get("GITHUB_ACCESS_TOKEN")
-github_user_assignee = os.environ.get("GITHUB_USER_ASSIGNEE")
 
 if github_access_token == None:
     print("GITHUB_ACCESS_TOKEN needs to be defined")
-    quit()
-
-if github_user_assignee == None:
-    print("GITHUB_USER_ASSIGNEE needs to be defined")
     quit()
 
 try:
@@ -27,16 +23,6 @@ try:
     issue_label = repo.get_label("broken link")
 
     open_issues = repo.get_issues(state="open", labels=[issue_label])
-
-    # Get the project's 'To do' column
-    projects = repo.get_projects()
-    project = projects[0]
-    project_columns = project.get_columns()
-    to_do_column = None
-    for project_column in project_columns:
-        if project_column.name == "To do":
-            to_do_column = project_column
-            break
 
     with open("../sources.csv", "r") as file:
         csv_file = csv.DictReader(file)
@@ -62,14 +48,11 @@ try:
                 if exists == False:
                     new_issue = repo.create_issue(
                         title=issue_title,
-                        assignee=github_user_assignee,
                         body=issue_body,
-                        labels=[issue_label],
-                    )
-                    to_do_column.create_card(
-                        content_id=new_issue.id, content_type="Issue"
+                        labels=[issue_label]
                     )
                     print(new_issue)
+                    
             else:
                 issue_body = "**Broken URL:** [#{}]({})\n\n".format(
                     row["Source URL"], row["Source URL"]
