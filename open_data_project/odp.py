@@ -34,7 +34,7 @@ def create_back_end(back_end_dir):
             shutil.copytree(item_path, os.path.join(back_end_dir, item), ignore=shutil.ignore_patterns("__pycache__"))
 
 def create_front_end(projectdir):
-    subprocess.run(["gem", "install", "../../jkan_odp-0.1.0.gem"], cwd = f"{projectdir}", shell=True)
+    subprocess.run(["gem", "install", "jkan_odp"], cwd = f"{projectdir}", shell=True)
     subprocess.run(["jkan_odp", "new", "jkan"], cwd = f"{projectdir}", shell=True)
 
 def run(project_main_file):

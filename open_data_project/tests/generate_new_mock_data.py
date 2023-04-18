@@ -72,8 +72,12 @@ def test_get_datasets(name, type):
             
     owner = "test_owner"
     outputdir = os.path.join("tests", "mock_data", type, "expected")
-
-    clean_folder(outputdir)  
+    
+    
+    if os.path.exists(outputdir):
+        clean_folder(outputdir)
+    else:
+        os.makedirs(outputdir)  
     
     if type == "ckan":
         urls = get_urls()
