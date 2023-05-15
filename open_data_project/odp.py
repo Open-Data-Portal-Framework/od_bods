@@ -36,6 +36,8 @@ def create_back_end(back_end_dir):
 def create_front_end(projectdir):
     subprocess.run(["gem", "install", "jkan_odp"], cwd = f"{projectdir}", shell=True)
     subprocess.run(["jkan_odp", "new", "jkan"], cwd = f"{projectdir}", shell=True)
+    subprocess.run(["gem", "install", "bundler"], cwd = f"{projectdir}", shell=True)
+    subprocess.run(["bundle", "update", "--bundler"], cwd = f"{projectdir}/jkan", shell=True)
 
 def run(project_main_file):
     subprocess.run(f"{project_main_file}.sh", shell=True)

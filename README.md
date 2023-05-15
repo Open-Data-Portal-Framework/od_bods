@@ -35,4 +35,4 @@ This will serve it on a local host. To see it, open the browser and open the "ht
 9. Deploy your portal's website on GitHub Pages in the settings of your front-end repository
 
 
-For more information, look at the provided video demonstration and the documentations.
+
